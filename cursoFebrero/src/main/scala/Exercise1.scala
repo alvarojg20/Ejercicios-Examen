@@ -1,14 +1,13 @@
-import Main.sparkSession
-import org.apache.spark.sql.{SQLContext, SparkSession}
+import org.apache.spark.sql.functions.col
 
 object Exercise1 extends App {
   implicit val sparkSession = Spark.createLocalSession
 
-  val df = sparkSession.read.format("avro").option("header", "true").load("src/main/resources/retail_db/products_avro/part-m-00000.avro")
+  val df = sparkSession.read.format("avro").option("header", "true").load("src/main/resources/retail_db/products_avro")
   df.show()
-  df.registerTempTable("products")
 
-  val results = df.sqlContext.sql("select * from products where product_price >= 20 and product_price <=23 and product_name like 'Nike%'")
+  val results = df.filter(col("product_price") <= 23 && col("product_price") >= 20 && col("product_name").startsWith("Nike"))
   results.show()
-  //results.write.format("com.databricks.spark.csv").save("ej2.csv")
+
+  results.write.format("parquet").mode("overwrite").option("compression","gzip").save("src/main/resources/exercise/solution1/")
 }

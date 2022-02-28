@@ -1,10 +1,14 @@
+import org.apache.spark.sql.functions
+import org.apache.spark.sql.functions.{col, concat_ws, lit, substring}
+
 object Exercise6 extends App {
   implicit val sparkSession = Spark.createLocalSession
 
   val df = sparkSession.read.format("avro").load("src/main/resources/retail_db/customers-avro")
   df.show()
-  df.registerTempTable("customers")
 
-  val results = df.sqlContext.sql("select customer_id, concat(left(customer_fname,1), ' ', customer_lname) as customer_name from customers")
+  val results = df.select(col("customer_id"),concat_ws(" ", col("customer_fname"), col("customer_lname")).as("customer_name"))
   results.show()
+
+  results.write.format("csv").mode("overwrite").option("sep","\t").option("compression","bzip2").save("src/main/resources/exercise/solution6")
 }

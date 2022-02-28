@@ -1,10 +1,13 @@
+import org.apache.spark.sql.functions.col
+
 object Exercise4 extends App{
   implicit val sparkSession = Spark.createLocalSession
 
   val df = sparkSession.read.option("header", "false").csv("src/main/resources/retail_db/categories")
   df.show()
-  df.registerTempTable("categorias")
 
-  val results = df.sqlContext.sql("select _c0, _c2 from categorias where _c2 = 'Soccer'")
+  val results = df.filter(col("_c2") === "Soccer")
   results.show()
+
+  results.write.format("com.databricks.spark.csv").mode("overwrite").save("src/main/resources/exercise/solution4")
 }
