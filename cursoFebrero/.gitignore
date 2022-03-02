@@ -3,4 +3,4 @@ nodemodules/
 resources/
 target/
 $ git rm -r --cached .idea
-git rm -r --cached target
+$ git rm -r --cached target
