@@ -14,7 +14,34 @@ object Ejercicio2 extends App{
     .withColumn("CallDate",to_timestamp(col("CallDate"),"MM/dd/yy"))
     .filter(year(col("CallDate")).equalTo("2018"))
     .orderBy(desc("CallDate"))
+
   types18.show()
 
+  val mostCalls18 = df.select(col("CallDate"))
+    .withColumn("CallDate",to_timestamp(col("CallDate"),"MM/dd/yy"))
+    .groupBy(col("CallDate")).count()
+    .filter(year(col("CallDate")).equalTo("2018"))
+    .orderBy(desc("CallDate"))
+  mostCalls18.show()
 
+  val neighBour = df.select(col("Neighborhood"))
+    .where(col("City").equalTo("SF"))
+    .groupBy(col("Neighborhood")).count()
+    .orderBy(desc("count"))
+  neighBour.show()
+
+  val delNeigh = df.select(col("Neighborhood"), col("Delay"))
+    .orderBy(desc("Delay"))
+  delNeigh.show()
+
+
+  //Ejercicios IoT
+  val dfIOT = sparkSession.read.option("header", "false").json("src/main/resources/EjerciciosSparkLearning/iot_devices.json")
+  dfIOT.show()
+
+  val umbral = dfIOT.filter(col("battery_level") < 5)
+  umbral.show()
+
+  val co2 = dfIOT.select("c02_level", "cn").orderBy(desc("c02_level"))
+  co2.show()
 }
