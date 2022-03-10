@@ -1,7 +1,8 @@
 package EjerciciosSparkLearning
 
 import EjerciciosExamen.Spark
-import org.apache.spark.sql.functions.{col, desc, month, to_date, to_timestamp, year}
+import org.apache.spark.sql.functions
+import org.apache.spark.sql.functions.{avg, col, desc, month, to_date, to_timestamp, year}
 import org.apache.spark.sql.types.TimestampType
 
 object Ejercicio2 extends App{
@@ -58,5 +59,15 @@ object Ejercicio2 extends App{
   co2.show()
 
   //Compute the min and max values for temperature, battery level, CO2, and humidity.
+  val minmax = dfIOT.agg(functions.min("temp").as("MinimoTemp"), functions.max("temp").as("MaximoTemp"),
+    functions.min("c02_level").as("MinimoCO2"), functions.max("c02_level").as("MaximoCO2"),
+    functions.min("humidity").as("MinimoHumidity"), functions.max("humidity").as("MaximoHumidity"),
+    functions.min("battery_level").as("MinimoBatLevel"), functions.max("battery_level").as("MaximoBatLevel"))
+  minmax.show()
+
   //Sort and group by average temperature, CO2, humidity, and country.
+  val sortandgb = dfIOT.groupBy(col("cn"))
+    .agg(avg("temp").as("AverageTemp"), avg("c02_level").as("AverageCO2"), avg("humidity").as("AverageHumidity"))
+    .orderBy("cn")
+  sortandgb.show()
 }
