@@ -2,7 +2,7 @@ package EjerciciosSparkLearning
 
 import EjerciciosExamen.Spark
 import org.apache.spark.sql.functions
-import org.apache.spark.sql.functions.{avg, col, desc, month, to_date, to_timestamp, year}
+import org.apache.spark.sql.functions.{avg, col, desc, month, to_date, to_timestamp, weekofyear, year}
 import org.apache.spark.sql.types.TimestampType
 
 object Ejercicio2 extends App{
@@ -39,12 +39,16 @@ object Ejercicio2 extends App{
   neighBour.show()
 
   //Which neighborhoods had the worst response times to fire calls in 2018?
-  val delNeigh = df.withColumn("CallDate",to_timestamp(col("CallDate"),"MM/dd/yy"))
-    .filter(year(col("CallDate")).equalTo("2018"))
+  val delNeigh = df
     .groupBy(col("Neighborhood")).avg("Delay")
     .orderBy(desc("avg(Delay)"))
   delNeigh.show()
 
+  //Which week in the year in 2018 had the most fire calls?
+  val week = df.withColumn("CallDate",to_timestamp(col("CallDate"),"MM/dd/yy"))
+    .filter(year(col("CallDate")).equalTo("2018")).withColumn("CWeek", weekofyear(col("CallDate")))
+    .groupBy(col("CWeek")).count().select("CWeek","count").orderBy(desc("count"))
+  week.show()
 
   //Ejercicios IoT
   val dfIOT = sparkSession.read.option("header", "false").json("src/main/resources/EjerciciosSparkLearning/iot_devices.json")
