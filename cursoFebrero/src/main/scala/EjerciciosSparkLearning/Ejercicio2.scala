@@ -50,11 +50,11 @@ object Ejercicio2 extends App{
   dfIOT.show()
 
   //Detect failing devices with battery levels below a threshold.
-  val umbral = dfIOT.filter(col("battery_level") < 5)
+  val umbral = dfIOT.filter(col("battery_level") < 5).orderBy(desc("battery_level")).select("battery_level", "device_name")
   umbral.show()
 
   //Identify offending countries with high levels of CO2 emissions.
-  val co2 = dfIOT.select("c02_level", "cn").orderBy(desc("c02_level"))
+  val co2 = dfIOT.select("c02_level", "cn").orderBy(desc("c02_level")).distinct().limit(5)
   co2.show()
 
   //Compute the min and max values for temperature, battery level, CO2, and humidity.
